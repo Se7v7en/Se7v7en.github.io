@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   KEEP.styleStatus = {
     isExpandPageWidth: false,
-    isDark: false,
+    isDark: true,
     fontSizeLevel: 0,
     isOpenPageAside: true
   }
