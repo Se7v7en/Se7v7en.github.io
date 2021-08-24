@@ -9,7 +9,7 @@
     
     <title>
         
-            Archive: 2021 |
+            基于Kubernetes的微服务架构 |
         
         Seven&#39;s Blog
     </title>
@@ -72,7 +72,7 @@
                         </li>
                     
                         <li class="menu-item">
-                            <a class="active"
+                            <a class=""
                                href="/archives"
                             >
                                 ARCHIVES
@@ -106,7 +106,7 @@
                 </li>
             
                 <li class="drawer-menu-item flex-center">
-                    <a class="active"
+                    <a class=""
                        href="/archives">ARCHIVES</a>
                 </li>
             
@@ -126,31 +126,76 @@
 
                 
                     <div class="fade-in-down-animation">
-    <div class="archive-container ">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">基于Kubernetes的微服务架构</span>
+        </div>
+
         
-<div class="archive-list-container">
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/github.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">Peng Guo</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;2021-08-24 16:35:27
+    </span>
     
-        <section class="archive-item">
-            <div class="archive-item-header">
-                <span class="archive-year">2021</span>
-                <span class="archive-year-post-count">[1]</span>
-            </div>
-            <ul class="article-list">
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
                 
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2021/08/24/%E5%9F%BA%E4%BA%8EKubernetes%E7%9A%84%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/"
-                        >基于Kubernetes的微服务架构</a>
-                        <span class="article-date">08-24</span>
+                    <li>
+                        <a href="/tags/Kubernetes-%E5%BE%AE%E6%9C%8D%E5%8A%A1/">Kubernetes,微服务</a>&nbsp;
                     </li>
                 
             </ul>
-        </section>
+        </span>
+    
+
+    
+    
+    
     
 </div>
 
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><p>当引入了Spring Cloud 的微服务框架后，我们初步的解决了扩容缩容、独立部署、运维和管理的问题。但是，对于开发人员、设计人员、架构人员来说，工作并没有变得轻松。微服务的各种新技术名词，就足够一名新手学习好长时间，比如：配置中心、服务发现、网关、熔断、负载均衡等。各种Spring Cloud 技术套件更是层出不穷，如：Config、Eureka、Zuul、Hystrix、Ribbon、Feign 等。</p>
+<p>而之所以在微服务架构里，我们选择在应用层面，而不是基础设施层面去解决这些分布式问题，完全是因为由硬件构成的基础设施，跟不上由软件构成的应用服务灵活性的无奈之举。</p>
+<p>不过，当 Kubernetes 统一了容器编排管理系统之后，这些纯技术性的底层问题，就开始有了被广泛认可和采纳的基础设施层面的解决方案。</p>
+<h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>真正的区别在于，Kubernetes的实现中，直接删除了配置中心、服务注册中心的工程。在其他工程的pom.xml文件中，也删除了如 Eureka、Ribbon、Config 等组件的依赖。取而代之的是增加了若干以 YAML 配置文件为载体的Skaffold和 Kubernetes 的资源描述，这些资源描述文件，将会动态构建出 DNS 服务器、服务负载均衡器等一系列虚拟化的基础设施，去代替原有的应用层面的技术组件。升级改造之后的应用架构如下图所示：</p>
+<p><img src="C:\Users\AWESOME\AppData\Roaming\Typora\typora-user-images\image-20210824171457887.png" alt="image-20210824171457887"></p>
+<h2 id="技术组件"><a href="#技术组件" class="headerlink" title="技术组件"></a>技术组件</h2><h3 id="·-环境感知"><a href="#·-环境感知" class="headerlink" title="· 环境感知"></a>· 环境感知</h3><p>Spring Cloud Kubernetes 本身引入了 Fabric8 的Kubernetes Client作为容器环境感知，不过引用的版本很旧，比如 Spring Cloud Kubernetes 1.1.2 中，采用的是 Fabric8 Kubernetes Client 4.4.1，Fabric8 提供的兼容性列表中，这个版本只支持到 Kubernetes 1.14，虽然实测在 1.16 上也能用，但是在 1.18 上就无法识别到最新的 Api-Server。因此 Maven 引入依赖时，你需要手工处理，排除旧版本，引入新版本。</p>
+<h3 id="·配置中心"><a href="#·配置中心" class="headerlink" title="·配置中心"></a>·配置中心</h3><p>采用 Kubernetes 的 ConfigMap 来管理，通过Spring Cloud Kubernetes Config自动将 ConfigMap 的内容注入到 Spring 配置文件中，并实现动态更新。</p>
+<h3 id="·服务发现"><a href="#·服务发现" class="headerlink" title="·服务发现"></a>·服务发现</h3><p>采用 Kubernetes 的 Service 来管理，通过Spring Cloud Kubernetes Discovery自动将 HTTP 访问中的服务转换为FQDN。</p>
+<h3 id="·负载均衡"><a href="#·负载均衡" class="headerlink" title="·负载均衡"></a>·负载均衡</h3><p>采用 Kubernetes Service 本身的负载均衡能力实现（就是 DNS 负载均衡），就可以不再需要 Ribbon 这样的客户端负载均衡了。Spring Cloud Kubernetes 从 1.1.2 开始，也已经移除了对 Ribbon 的适配支持，也（暂时）没有对其代替品 Spring Cloud LoadBalancer 提供适配。</p>
+<h3 id="·服务网关"><a href="#·服务网关" class="headerlink" title="·服务网关"></a>·服务网关</h3><p>网关部分仍然保留了 Zuul，没有采用 Ingress 来代替。这里我主要有两点考虑，一是 Ingress Controller 不算是 Kubernetes 的自带组件，它可以有不同的选择（如 KONG、Nginx、Haproxy 等），同时也需要独立安装，出于环境复杂度最小化的考虑，我没有使用 Ingress。</p>
+<h3 id="·服务熔断"><a href="#·服务熔断" class="headerlink" title="·服务熔断"></a>·服务熔断</h3><p>仍然采用 Hystrix，Kubernetes 本身无法做到精细化的服务治理，包括熔断、流控、监视，等等。</p>
+<h3 id="·认证授权"><a href="#·认证授权" class="headerlink" title="·认证授权"></a>·认证授权</h3><p>采用 Spring Security OAuth 2.0，Kubernetes 的 RBAC 授权可以解决服务层面的访问控制问题，但 Security 是跨越了业务和技术的边界的，认证授权模块本身仍然承担着对前端用户的认证、授权职责，这部分是与业务相关的。</p>
+
+        </div>
+
+        
+
+        
+
+        
     </div>
 </div>
+
 
                 
             </div>
@@ -175,6 +220,23 @@
         </div>
     </div>
 
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="tools-item page-aside-toggle">
+                <i class="fas fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
     
 
     <div class="right-bottom-side-tools">
@@ -220,6 +282,14 @@
 
     </div>
 
+    
+        <aside class="page-aside">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF"><span class="nav-text">场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%BA%E5%88%AB"><span class="nav-text">区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E7%BB%84%E4%BB%B6"><span class="nav-text">技术组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%C2%B7-%E7%8E%AF%E5%A2%83%E6%84%9F%E7%9F%A5"><span class="nav-text">· 环境感知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%C2%B7%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83"><span class="nav-text">·配置中心</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%C2%B7%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0"><span class="nav-text">·服务发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%C2%B7%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-text">·负载均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%C2%B7%E6%9C%8D%E5%8A%A1%E7%BD%91%E5%85%B3"><span class="nav-text">·服务网关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%C2%B7%E6%9C%8D%E5%8A%A1%E7%86%94%E6%96%AD"><span class="nav-text">·服务熔断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%C2%B7%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83"><span class="nav-text">·认证授权</span></a></li></ol></li></ol>
+    </div>
+</div>
+        </aside>
     
 
     <div class="image-viewer-container">
@@ -289,6 +359,14 @@
 
 
 <div class="post-scripts pjax">
+    
+        
+<script src="/js/left-side-toggle.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+<script src="/js/toc.js"></script>
+
     
 </div>
 
